@@ -13,16 +13,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api")
 public class OrderServiceCodebuildPipelineEcrApplication {
 	@Autowired
     private OrderDao orderDao;
+	@GetMapping("/details")
+	public String getDetails() {
+		return "welcome to ECS";}
+	
 
-    @GetMapping
+    @GetMapping("/orders")
     public List<Order> fetchOrders() {
         return orderDao.getOrders().stream().
                 sorted(Comparator.comparing(Order::getPrice)).collect(Collectors.toList());
     }
+    
 
 
 	public static void main(String[] args) {
