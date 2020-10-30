@@ -19,7 +19,7 @@ public class OrderServiceCodebuildPipelineEcrApplication {
     private OrderDao orderDao;
 	@GetMapping("/details")
 	public String getDetails() {
-		return "welcome to ECS";}
+		return "welcome to ECS V3";}
 	
 
     @GetMapping("/orders")
