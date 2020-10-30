@@ -1,33 +1,30 @@
 version: 0.2
-
-
 phases:
+  install:
+    runtime-versions:
+      java: openjdk8
   pre_build:
     commands:
-      - mvn clean install
-      - echo Logging in to Amazon ECR...
-      - aws --version
-      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
-      - REPOSITORY_URI=278105647443.dkr.ecr.ap-south-1.amazonaws.com/narayandutta-registry
-      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
+    - echo Logging in to Amazon ECR...
+    - aws --version
+    - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+    - TAG="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
+    - IMAGE_URI=${REPOSITORY_URI}:${TAG}
   build:
     commands:
-      - echo Build started on `date`
-      - echo Building the Docker image...
-      - docker build -t $REPOSITORY_URI:latest .
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+    - echo Build started on `date`
+    - echo $IMAGE_URI
+    - mvn clean package -Ddockerfile.skip
+    - docker build --tag $IMAGE_URI .
   post_build:
     commands:
-      - echo Build completed on `date`
-      - echo Pushing the Docker images...
-      - docker push $REPOSITORY_URI:latest
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - echo Writing image definitions file...
-      - printf '[{"name":"order-service","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-      - cat imagedefinitions.json
+    - printenv
+    - echo Build completed on `date`
+    - echo $(docker images)
+    - echo Pushing docker image
+    - docker push $IMAGE_URI
+    - echo push completed
+    - printf '[{"name":"%s","imageUri":"%s"}]' $CONTAINER_NAME $IMAGE_URI > imagedefinitions.json
 artifacts:
   files:
-   - imagedefinitions.json
-   - target/order-service.jar
-
+  - imagedefinitions.json
