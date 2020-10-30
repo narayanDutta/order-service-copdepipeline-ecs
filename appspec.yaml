@@ -3,9 +3,9 @@ Resources:
   - TargetService:
       Type: AWS::ECS::Service
       Properties:
-        TaskDefinition: "arn:aws:ecs:ap-south-1:278105647443:task-definition/aws-hello-world-rest-api-pipeline:1"
+        TaskDefinition: "arn:aws:ecs:ap-south-1:278105647443:task-definition/order-service-codebuild:1"
         LoadBalancerInfo:
-          ContainerName: "aws-hello-world-rest-api-pipeline"
+          ContainerName: "order-service-container"
           ContainerPort: "80"
         PlatformVersion: "LATEST"
         
